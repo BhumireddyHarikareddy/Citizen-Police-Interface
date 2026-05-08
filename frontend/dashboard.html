@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Police Dashboard</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      color: #333;
+    }
+
+    header {
+      background: #0d253f;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      padding: 40px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 40px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
+
+    .card i {
+      font-size: 50px;
+      color: #0d253f;
+      margin-bottom: 15px;
+    }
+
+    .card h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #0d253f;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #666;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #0d253f;
+      color: white;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    🚔 Police Dashboard
+  </header>
+
+  <div class="dashboard">
+    <!-- Manage Missing Persons -->
+    <div class="card" onclick="location.href='missing_add.html'">
+      <i class="fas fa-user-slash"></i>
+      <h3>Manage Missing Persons</h3>
+      <p>Add, update, or mark missing persons as found.</p>
+    </div>
+
+    <!-- Manage Wanted Criminals -->
+    <div class="card" onclick="location.href='wanted_add.html'">
+      <i class="fas fa-user-secret"></i>
+      <h3>Wanted Criminals</h3>
+      <p>Track and update the wanted criminals list.</p>
+    </div>
+
+    <!-- Report Crime -->
+    <div class="card" onclick="location.href='view_report.html'">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h3> View Crime Reports</h3>
+      <p>View and verify reported crimes.</p>
+    </div>
+
+    <!-- Missing Person Sightings -->
+    <div class="card" onclick="location.href='missing_responses.html'">
+      <i class="fas fa-eye"></i>
+      <h3>Missing Person Sightings</h3>
+      <p>View all submitted sighting information.</p>
+    </div>
+
+    <!-- Wanted Criminal Responses -->
+    <div class="card" onclick="location.href='wanted_responses.html'">
+      <i class="fas fa-bell"></i>
+      <h3>Wanted Criminal Responses</h3>
+      <p>View all reported tips and sightings.</p>
+    </div>
+  </div>
+
+
+</body>
+</html>

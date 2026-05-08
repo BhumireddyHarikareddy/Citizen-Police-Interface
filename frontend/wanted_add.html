@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Wanted Criminal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f9;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      padding: 32px 24px;
+    }
+    h2 {
+      text-align: center;
+      color: #0d253f;
+      margin-bottom: 24px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 12px 0 6px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+    button {
+      background: #0d253f;
+      color: white;
+      padding: 12px 0;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #123d6a;
+    }
+    .photo-preview {
+      display: block;
+      margin: 10px auto 20px auto;
+      max-width: 180px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Add Wanted Criminal</h2>
+    <form id="wantedForm" enctype="multipart/form-data">
+      <label for="photo">Photo:</label>
+      <input type="file" id="photo" name="photo" accept="image/*" required>
+      <img id="photoPreview" class="photo-preview" style="display:none;" />
+
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="age">Age:</label>
+      <input type="number" id="age" name="age" required>
+
+      <label for="gender">Gender:</label>
+      <select id="gender" name="gender" required>
+        <option value="">Select</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="crime">Crime Details:</label>
+      <textarea id="crime" name="crime" rows="3" placeholder="Describe the crime..." required></textarea>
+
+      <label for="lastSeen">Last Seen Location:</label>
+      <input type="text" id="lastSeen" name="lastSeen" required>
+
+      <label for="contact">Contact for Tips:</label>
+      <input type="text" id="contact" name="contact" placeholder="Police contact or tip line" required>
+
+      <button type="submit">Add Wanted</button>
+        <div id="wantedMessage" style="margin-top:12px;font-weight:bold;"></div>
+    </form>
+  </div>
+  <script>
+    // Preview photo before upload
+    document.getElementById('photo').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          const img = document.getElementById('photoPreview');
+          img.src = ev.target.result;
+          img.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Handle form submission with better diagnostics and UI feedback
+    document.getElementById('wantedForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const msg = document.getElementById('wantedMessage');
+      msg.style.color = '';
+      msg.textContent = 'Submitting...';
+      submitBtn.disabled = true;
+      const formData = new FormData(form);
+      try {
+        const response = await fetch('http://localhost:3002/api/wanted', {
+          method: 'POST',
+          body: formData
+        });
+        if (!response.ok) {
+          msg.style.color = 'red';
+          msg.textContent = `Server returned ${response.status} ${response.statusText}`;
+        } else {
+          const result = await response.json();
+          if (result.success) {
+            msg.style.color = 'green';
+            msg.textContent = 'Wanted criminal added successfully!';
+            form.reset();
+            document.getElementById('photoPreview').style.display = 'none';
+          } else {
+            msg.style.color = 'red';
+            msg.textContent = 'Error: ' + (result.message || 'Could not add wanted criminal.');
+            console.error('API error response:', result);
+          }
+        }
+      } catch (err) {
+        msg.style.color = 'red';
+        msg.textContent = 'Server error. Please try again later.';
+        console.error(err);
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

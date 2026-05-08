@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Crime</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f2f2f2;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #0d253f;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 10px 0 5px;
+    }
+
+    select, input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      background: #0d253f;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #123d6a;
+    }
+
+    .form-section {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Report a Crime</h2>
+    <form id="crimeReportForm" autocomplete="off">
+
+      <!-- Reporting Person Details -->
+      <h3>Reporting Person Details</h3>
+
+      <label for="reporterName">Full Name:</label>
+      <input type="text" id="reporterName" name="reporterName" placeholder="Enter your name" required>
+
+      <label for="reporterAge">Age:</label>
+      <input type="number" id="reporterAge" name="reporterAge" placeholder="Enter your age" required>
+
+      <label for="reporterGender">Gender:</label>
+      <select id="reporterGender" name="reporterGender" required>
+        <option value="">Select</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="reporterPhone">Phone Number:</label>
+      <input type="tel" id="reporterPhone" name="reporterPhone" pattern="[0-9]{10}" placeholder="10-digit number" required>
+
+      <label for="reporterEmail">Email:</label>
+      <input type="email" id="reporterEmail" name="reporterEmail" placeholder="Enter your email" required>
+
+      <label for="reporterAddress">Address:</label>
+      <textarea id="reporterAddress" name="reporterAddress" rows="3" cols="40" placeholder="Enter your address" required></textarea>
+
+      <hr style="margin:20px 0;">
+
+      <!-- Crime Selection -->
+      <label for="crimeType">Select Crime Type:</label>
+      <select id="crimeType" onchange="showForm()">
+        <option value="">-- Select --</option>
+        <option value="missing">Missing Person</option>
+        <option value="theft">Theft</option>
+        <option value="suspicious">Suspicious Activity</option>
+        <option value="assault">Assault</option>
+        <option value="vandalism">Vandalism</option>
+        <option value="cyber">Cyber Crime</option>
+        <option value="domestic">Domestic Violence</option>
+        <option value="drug">Drug Offense</option>
+        <option value="traffic">Traffic Violation</option>
+        <option value="fraud">Fraud/Scam</option>
+        <option value="arson">Arson</option>
+        <option value="other">Other</option>
+      </select>
+
+      <!-- Missing Person -->
+      <div id="missingForm" class="form-section">
+        <label>Full Name of Missing Person:</label>
+        <input type="text" name="missing_name" placeholder="Enter name">
+
+        <label>Age:</label>
+        <input type="number" name="missing_age" placeholder="Enter age">
+
+        <label>Gender:</label>
+        <select name="missing_gender">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label>Last Seen Location:</label>
+        <input type="text" name="missing_last_seen_location" placeholder="Enter last seen location">
+
+        <label>Date & Time Last Seen:</label>
+        <input type="datetime-local" name="missing_last_seen_datetime">
+
+        <label>Clothing / Dress Color:</label>
+        <input type="text" name="missing_clothing" placeholder="Describe clothing">
+
+        <label>Any Unique Identification Marks:</label>
+        <textarea name="missing_identification_marks" placeholder="E.g. birthmark, scar..."></textarea>
+
+        <label>Relation to Reporter:</label>
+        <input type="text" name="missing_relation_to_reporter" placeholder="E.g. friend, family, neighbor">
+
+        <label>Contact Number for Updates:</label>
+        <input type="tel" name="missing_contact_number" placeholder="Enter phone number">
+      </div>
+
+      <!-- Theft -->
+      <div id="theftForm" class="form-section">
+        <label>Type of Theft:</label>
+        <select name="theft_type">
+          <option value="Vehicle Theft">Vehicle Theft</option>
+          <option value="Burglary">Burglary</option>
+          <option value="Pickpocket">Pickpocket</option>
+          <option value="Shoplifting">Shoplifting</option>
+          <option value="Robbery">Robbery</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label>Location of Theft:</label>
+        <input type="text" name="theft_location" placeholder="Enter location">
+
+        <label>Date & Time of Incident:</label>
+        <input type="datetime-local" name="theft_datetime">
+
+        <label>Items Stolen:</label>
+        <textarea name="theft_items_stolen" placeholder="List stolen items"></textarea>
+
+        <label>Estimated Value of Stolen Items:</label>
+        <input type="number" name="theft_estimated_value" placeholder="Enter value in local currency">
+
+        <label>Suspect Description (if any):</label>
+        <textarea name="theft_suspect_description" placeholder="Height, dress, vehicle..."></textarea>
+
+        <label>Was a police report filed earlier?</label>
+        <select name="theft_report_filed">
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+        </select>
+      </div>
+
+      <!-- Suspicious Activity -->
+      <div id="suspiciousForm" class="form-section">
+        <label>Location of Suspicious Activity:</label>
+        <input type="text" name="suspicious_location" placeholder="Enter location">
+
+        <label>Date & Time Noticed:</label>
+        <input type="datetime-local" name="suspicious_datetime">
+
+        <label>Describe the Activity:</label>
+        <textarea name="suspicious_activity" placeholder="Describe what you observed"></textarea>
+
+        <label>People Involved (if any):</label>
+        <input type="text" name="suspicious_people" placeholder="Describe person(s)">
+
+        <label>Any vehicles involved? (describe):</label>
+        <input type="text" name="suspicious_vehicle" placeholder="Vehicle make/model/plate">
+
+        <label>Did you take any photos or videos?</label>
+        <select name="suspicious_photos">
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+        </select>
+      </div>
+
+      <!-- Assault -->
+      <div id="assaultForm" class="form-section">
+        <label>Type of Assault:</label>
+        <select name="assault_type">
+          <option value="Physical">Physical</option>
+          <option value="Verbal">Verbal</option>
+          <option value="Sexual">Sexual</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label>Location of Assault:</label>
+        <input type="text" name="assault_location" placeholder="Enter location">
+
+        <label>Date & Time of Incident:</label>
+        <input type="datetime-local" name="assault_datetime">
+
+        <label>Describe the Incident:</label>
+        <textarea name="assault_description" placeholder="Describe what happened"></textarea>
+
+        <label>Injuries Sustained:</label>
+        <input type="text" name="assault_injuries" placeholder="Describe injuries">
+
+        <label>Suspect(s) Description:</label>
+        <textarea name="assault_suspect_description" placeholder="Describe suspect(s)"></textarea>
+
+        <label>Relationship to Suspect (if any):</label>
+        <input type="text" name="assault_relationship" placeholder="E.g. stranger, acquaintance">
+      </div>
+
+      <!-- Vandalism -->
+      <div id="vandalismForm" class="form-section">
+        <label>Type of Vandalism:</label>
+        <select name="vandalism_type">
+          <option value="Graffiti">Graffiti</option>
+          <option value="Property Damage">Property Damage</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label>Location:</label>
+        <input type="text" name="vandalism_location" placeholder="Enter location">
+
+        <label>Date & Time of Incident:</label>
+        <input type="datetime-local" name="vandalism_datetime">
+
+        <label>Description of Damage:</label>
+        <textarea name="vandalism_description" placeholder="Describe the damage"></textarea>
+
+        <label>Estimated Cost of Damage:</label>
+        <input type="number" name="vandalism_estimated_cost" placeholder="Enter value in local currency">
+      </div>
+
+      <!-- Cyber Crime -->
+      <div id="cyberForm" class="form-section">
+        <label>Type of Cyber Crime:</label>
+        <select name="cyber_type">
+          <option value="Hacking">Hacking</option>
+          <option value="Online Scam">Online Scam</option>
+          <option value="Identity Theft">Identity Theft</option>
+          <option value="Cyberbullying">Cyberbullying</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label>Platform/Website Involved:</label>
+        <input type="text" name="cyber_platform" placeholder="E.g. Facebook, Bank, etc.">
+
+        <label>Date & Time of Incident:</label>
+        <input type="datetime-local" name="cyber_datetime">
+
+        <label>Describe the Incident:</label>
+        <textarea name="cyber_description" placeholder="Describe what happened"></textarea>
+
+        <label>Financial Loss (if any):</label>
+        <input type="number" name="cyber_financial_loss" placeholder="Enter value in local currency">
+      </div>
+
+      <!-- Domestic Violence -->
+      <div id="domesticForm" class="form-section">
+        <label>Type of Domestic Violence:</label>
+        <select name="domestic_type">
+          <option value="Physical">Physical</option>
+          <option value="Emotional">Emotional</option>
+          <option value="Sexual">Sexual</option>
+          <option value="Economic">Economic</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label>Location:</label>
+        <input type="text" name="domestic_location" placeholder="Enter location">
+
+        <label>Date & Time of Incident:</label>
+        <input type="datetime-local" name="domestic_datetime">
+
+        <label>Describe the Incident:</label>
+        <textarea name="domestic_description" placeholder="Describe what happened"></textarea>
+
+        <label>Relationship to Offender:</label>
+        <input type="text" name="domestic_relationship" placeholder="E.g. spouse, parent">
+      </div>
+
+      <!-- Drug Offense -->
+      <div id="drugForm" class="form-section">
+        <label>Type of Drug Offense:</label>
+        <select name="drug_type">
+          <option value="Possession">Possession</option>
+          <option value="Trafficking">Trafficking</option>
+          <option value="Manufacturing">Manufacturing</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label>Location:</label>
+        <input type="text" name="drug_location" placeholder="Enter location">
+
+        <label>Date & Time of Incident:</label>
+        <input type="datetime-local" name="drug_datetime">
+
+        <label>Describe the Incident:</label>
+        <textarea name="drug_description" placeholder="Describe what happened"></textarea>
+      </div>
+
+      <!-- Traffic Violation -->
+      <div id="trafficForm" class="form-section">
+        <label>Type of Violation:</label>
+        <select name="traffic_type">
+          <option value="Speeding">Speeding</option>
+          <option value="Drunk Driving">Drunk Driving</option>
+          <option value="Signal Jumping">Signal Jumping</option>
+          <option value="No License">No License</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label>Location:</label>
+        <input type="text" name="traffic_location" placeholder="Enter location">
+
+        <label>Date & Time of Violation:</label>
+        <input type="datetime-local" name="traffic_datetime">
+
+        <label>Vehicle Details:</label>
+        <input type="text" name="traffic_vehicle_details" placeholder="Make/model/plate">
+      </div>
+
+      <!-- Fraud/Scam -->
+      <div id="fraudForm" class="form-section">
+        <label>Type of Fraud/Scam:</label>
+        <select name="fraud_type">
+          <option value="Phone Scam">Phone Scam</option>
+          <option value="Email Scam">Email Scam</option>
+          <option value="Identity Theft">Identity Theft</option>
+          <option value="Bank Fraud">Bank Fraud</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label>Platform/Medium:</label>
+        <input type="text" name="fraud_platform" placeholder="E.g. phone, email, website">
+
+        <label>Date & Time of Incident:</label>
+        <input type="datetime-local" name="fraud_datetime">
+
+        <label>Describe the Incident:</label>
+        <textarea name="fraud_description" placeholder="Describe what happened"></textarea>
+
+        <label>Financial Loss (if any):</label>
+        <input type="number" name="fraud_financial_loss" placeholder="Enter value in local currency">
+      </div>
+
+      <!-- Arson -->
+      <div id="arsonForm" class="form-section">
+        <label>Location of Fire:</label>
+        <input type="text" name="arson_location" placeholder="Enter location">
+
+        <label>Date & Time of Incident:</label>
+        <input type="datetime-local" name="arson_datetime">
+
+        <label>Describe the Incident:</label>
+        <textarea name="arson_description" placeholder="Describe what happened"></textarea>
+
+        <label>Estimated Damage:</label>
+        <input type="number" name="arson_estimated_damage" placeholder="Enter value in local currency">
+      </div>
+
+      <!-- Other -->
+      <div id="otherForm" class="form-section">
+        <label>Describe the Crime:</label>
+        <textarea name="other_description" placeholder="Provide full details"></textarea>
+
+        <label>Location:</label>
+        <input type="text" name="other_location" placeholder="Enter location">
+
+        <label>Date & Time of Incident:</label>
+        <input type="datetime-local" name="other_datetime">
+
+        <label>Any witnesses? (names/contact):</label>
+        <input type="text" name="other_witnesses" placeholder="List witnesses if any">
+      </div>
+
+      <button type="submit">Submit Report</button>
+    </form>
+  </div>
+
+  <script>
+    function showForm() {
+      document.querySelectorAll('.form-section').forEach(div => div.style.display = 'none');
+      const crimeType = document.getElementById('crimeType').value;
+      if (crimeType) {
+        document.getElementById(crimeType + 'Form').style.display = 'block';
+      }
+    }
+
+    // Handle form submission
+    document.getElementById('crimeReportForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+      // Add crimeType (in case not included)
+      data.crimeType = document.getElementById('crimeType').value;
+
+      try {
+        const response = await fetch('http://localhost:3001/api/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (result.success) {
+          alert('Report submitted successfully!');
+          form.reset();
+          showForm();
+        } else {
+          alert('Error: ' + (result.message || 'Could not submit report.'));
+        }
+      } catch (err) {
+        alert('Server error. Please try again later.');
+      }
+    });
+  </script>
+</body>
+</html>

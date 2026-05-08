@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Police Dashboard - Crime Details</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 20px; }
+  h2 { text-align: center; color: #0d253f; }
+  .filter-section { text-align: center; margin-bottom: 20px; }
+  select, button { padding: 8px 12px; margin: 0 5px; border-radius: 6px; border: 1px solid #ccc; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
+  th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+  th { background: #0d253f; color: white; }
+  tr:hover { background: #f1f1f1; }
+</style>
+</head>
+<body>
+
+<h2>Police Dashboard - Crime Details</h2>
+
+<div id="reportMessage" style="text-align:center;margin-bottom:8px;font-weight:bold"></div>
+
+<div class="filter-section">
+  <select id="crimeTypeSelect">
+    <option value="">-- Select Crime Type --</option>
+    <option value="missing">Missing Person</option>
+    <option value="theft">Theft</option>
+    <option value="suspicious">Suspicious Activity</option>
+    <option value="assault">Assault</option>
+    <option value="vandalism">Vandalism</option>
+    <option value="cyber">Cyber Crime</option>
+    <option value="domestic">Domestic Violence</option>
+    <option value="drug">Drug Offense</option>
+    <option value="traffic">Traffic Violation</option>
+    <option value="fraud">Fraud/Scam</option>
+    <option value="arson">Arson</option>
+    <option value="other">Other</option>
+  </select>
+  <button onclick="applyFilter()">Apply</button>
+</div>
+
+<table id="crimeTable">
+  <thead id="tableHead">
+    <!-- Will be filled dynamically -->
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+async function fetchReports() {
+  try {
+    const response = await fetch('http://localhost:3004/api/reports'); // view_report.js backend
+    if (!response.ok) throw new Error('Network response was not ok: ' + response.status);
+    const data = await response.json();
+    // Backend may return { success: true, data: [...] } or an array directly
+    if (Array.isArray(data)) return data;
+    if (data && data.success && Array.isArray(data.data)) return data.data;
+    console.warn('Unexpected reports response shape:', data);
+    return [];
+  } catch (err) {
+    const msg = document.getElementById('reportMessage');
+    if (msg) {
+      msg.style.color = 'red';
+      msg.textContent = 'Failed to fetch reports: ' + err.message;
+    } else {
+      alert('Failed to fetch reports.');
+    }
+    console.error(err);
+    return [];
+  }
+}
+
+
+// Map of columns for each crime type
+const crimeColumns = {
+  missing: [
+    { key: 'id', label: 'ID' },
+    { key: 'reporter_name', label: 'Reporter Name' },
+    { key: 'missing_name', label: 'Missing Name' },
+    { key: 'missing_age', label: 'Age' },
+    { key: 'missing_gender', label: 'Gender' },
+    { key: 'missing_last_seen_location', label: 'Last Seen Location' },
+    { key: 'missing_last_seen_datetime', label: 'Last Seen Date/Time' },
+    { key: 'missing_clothing', label: 'Clothing' },
+    { key: 'missing_identification_marks', label: 'Identification Marks' },
+    { key: 'missing_relation_to_reporter', label: 'Relation to Reporter' },
+    { key: 'missing_contact_number', label: 'Contact Number' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ],
+  theft: [
+    { key: 'id', label: 'ID' },
+    { key: 'reporter_name', label: 'Reporter Name' },
+    { key: 'theft_type', label: 'Theft Type' },
+    { key: 'theft_location', label: 'Location' },
+    { key: 'theft_datetime', label: 'Date/Time' },
+    { key: 'theft_items_stolen', label: 'Items Stolen' },
+    { key: 'theft_estimated_value', label: 'Estimated Value' },
+    { key: 'theft_suspect_description', label: 'Suspect Description' },
+    { key: 'theft_report_filed', label: 'Report Filed' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ],
+  suspicious: [
+    { key: 'id', label: 'ID' },
+    { key: 'reporter_name', label: 'Reporter Name' },
+    { key: 'suspicious_location', label: 'Location' },
+    { key: 'suspicious_datetime', label: 'Date/Time' },
+    { key: 'suspicious_activity', label: 'Activity' },
+    { key: 'suspicious_people', label: 'People' },
+    { key: 'suspicious_vehicle', label: 'Vehicle' },
+    { key: 'suspicious_photos', label: 'Photos/Videos' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ],
+  assault: [
+    { key: 'id', label: 'ID' },
+    { key: 'reporter_name', label: 'Reporter Name' },
+    { key: 'assault_type', label: 'Assault Type' },
+    { key: 'assault_location', label: 'Location' },
+    { key: 'assault_datetime', label: 'Date/Time' },
+    { key: 'assault_description', label: 'Description' },
+    { key: 'assault_injuries', label: 'Injuries' },
+    { key: 'assault_suspect_description', label: 'Suspect Description' },
+    { key: 'assault_relationship', label: 'Relationship' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ],
+  vandalism: [
+    { key: 'id', label: 'ID' },
+    { key: 'reporter_name', label: 'Reporter Name' },
+    { key: 'vandalism_type', label: 'Vandalism Type' },
+    { key: 'vandalism_location', label: 'Location' },
+    { key: 'vandalism_datetime', label: 'Date/Time' },
+    { key: 'vandalism_description', label: 'Description' },
+    { key: 'vandalism_estimated_cost', label: 'Estimated Cost' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ],
+  cyber: [
+    { key: 'id', label: 'ID' },
+    { key: 'reporter_name', label: 'Reporter Name' },
+    { key: 'cyber_type', label: 'Cyber Type' },
+    { key: 'cyber_platform', label: 'Platform' },
+    { key: 'cyber_datetime', label: 'Date/Time' },
+    { key: 'cyber_description', label: 'Description' },
+    { key: 'cyber_financial_loss', label: 'Financial Loss' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ],
+  domestic: [
+    { key: 'id', label: 'ID' },
+    { key: 'reporter_name', label: 'Reporter Name' },
+    { key: 'domestic_type', label: 'Domestic Type' },
+    { key: 'domestic_location', label: 'Location' },
+    { key: 'domestic_datetime', label: 'Date/Time' },
+    { key: 'domestic_description', label: 'Description' },
+    { key: 'domestic_relationship', label: 'Relationship' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ],
+  drug: [
+    { key: 'id', label: 'ID' },
+    { key: 'reporter_name', label: 'Reporter Name' },
+    { key: 'drug_type', label: 'Drug Type' },
+    { key: 'drug_location', label: 'Location' },
+    { key: 'drug_datetime', label: 'Date/Time' },
+    { key: 'drug_description', label: 'Description' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ],
+  traffic: [
+    { key: 'id', label: 'ID' },
+    { key: 'reporter_name', label: 'Reporter Name' },
+    { key: 'traffic_type', label: 'Traffic Type' },
+    { key: 'traffic_location', label: 'Location' },
+    { key: 'traffic_datetime', label: 'Date/Time' },
+    { key: 'traffic_vehicle_details', label: 'Vehicle Details' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ],
+  fraud: [
+    { key: 'id', label: 'ID' },
+    { key: 'reporter_name', label: 'Reporter Name' },
+    { key: 'fraud_type', label: 'Fraud Type' },
+    { key: 'fraud_platform', label: 'Platform' },
+    { key: 'fraud_datetime', label: 'Date/Time' },
+    { key: 'fraud_description', label: 'Description' },
+    { key: 'fraud_financial_loss', label: 'Financial Loss' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ],
+  arson: [
+    { key: 'id', label: 'ID' },
+    { key: 'reporter_name', label: 'Reporter Name' },
+    { key: 'arson_location', label: 'Location' },
+    { key: 'arson_datetime', label: 'Date/Time' },
+    { key: 'arson_description', label: 'Description' },
+    { key: 'arson_estimated_damage', label: 'Estimated Damage' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ],
+  other: [
+    { key: 'id', label: 'ID' },
+    { key: 'reporter_name', label: 'Reporter Name' },
+    { key: 'other_description', label: 'Description' },
+    { key: 'other_location', label: 'Location' },
+    { key: 'other_datetime', label: 'Date/Time' },
+    { key: 'other_witnesses', label: 'Witnesses' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ]
+};
+
+async function applyFilter() {
+  const crimeType = document.getElementById('crimeTypeSelect').value;
+  const reportMsg = document.getElementById('reportMessage');
+  if (reportMsg) { reportMsg.style.color = ''; reportMsg.textContent = 'Loading...'; }
+  const reports = await fetchReports();
+  const tbody = document.querySelector('#crimeTable tbody');
+  const thead = document.getElementById('tableHead');
+  tbody.innerHTML = '';
+  thead.innerHTML = '';
+
+  let columns;
+  if (crimeType && crimeColumns[crimeType]) {
+    columns = crimeColumns[crimeType];
+  } else {
+    // Show a default set if no filter
+    columns = [
+      { key: 'id', label: 'ID' },
+      { key: 'reporter_name', label: 'Reporter Name' },
+      { key: 'crimeType', label: 'Crime Type' },
+      { key: 'status', label: 'Status' },
+      { key: 'action', label: 'Action' }
+    ];
+  }
+
+  // Render table head
+  const trHead = document.createElement('tr');
+  columns.forEach(col => {
+    const th = document.createElement('th');
+    th.textContent = col.label;
+    trHead.appendChild(th);
+  });
+  thead.appendChild(trHead);
+
+  // Filter reports
+  const filtered = Array.isArray(reports) ? (crimeType ? reports.filter(r => r.crimeType === crimeType) : reports) : [];
+
+  if (reportMsg) {
+    if (!filtered.length) {
+      reportMsg.style.color = '#333';
+      reportMsg.textContent = 'No reports found.';
+    } else {
+      reportMsg.textContent = '';
+    }
+  }
+
+  filtered.forEach(r => {
+    const tr = document.createElement('tr');
+    columns.forEach(col => {
+      let val = '';
+      if (col.key === 'action') {
+        const nextStatus = r.status === 'Solved' ? 'Pending' : 'Solved';
+        val = `<button onclick=\"toggleStatus(${r.id})\">Mark as ${nextStatus}</button>`;
+      } else if (col.key === 'status') {
+        val = r.status || 'Pending';
+      } else {
+        val = r[col.key] || '-';
+      }
+      const td = document.createElement('td');
+      td.innerHTML = val;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+async function toggleStatus(id) {
+  try {
+    const res = await fetch(`http://localhost:3004/api/reports/${id}/toggle-status`, { method: 'PATCH' });
+    const result = await res.json();
+    if(result.success) {
+      alert('Status updated successfully!');
+      applyFilter();
+    } else {
+      alert('Failed to update status.');
+    }
+  } catch (err) {
+    alert('Failed to update status.');
+  }
+}
+
+// Initial load
+applyFilter();
+</script>
+
+</body>
+</html>
+

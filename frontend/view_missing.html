@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Missing Persons</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f9;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      padding: 32px 24px;
+    }
+    h2 {
+      text-align: center;
+      color: #0d253f;
+      margin-bottom: 24px;
+    }
+    .missing-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+    }
+    .missing-card {
+      background: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      width: 270px;
+      padding: 18px 14px 14px 14px;
+      margin-bottom: 18px;
+      text-align: center;
+      position: relative;
+    }
+    .missing-card img {
+      max-width: 120px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+    }
+    .missing-card h3 {
+      margin: 8px 0 4px 0;
+      color: #0d253f;
+      font-size: 1.15em;
+    }
+    .missing-card p {
+      margin: 4px 0;
+      font-size: 0.98em;
+      color: #333;
+    }
+    .missing-card .status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .missing-card .status.missing {
+      background: #ffcccc;
+      color: #cc0000;
+    }
+    .missing-card .status.found {
+      background: #ccffcc;
+      color: #00cc00;
+    }
+    .response-form {
+      margin-top: 12px;
+      background: #e9ecef;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: left;
+    }
+    .response-form label {
+      font-weight: bold;
+      margin-top: 8px;
+      display: block;
+    }
+    .response-form input, .response-form textarea {
+      width: 100%;
+      padding: 7px;
+      margin-bottom: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .response-form button {
+      background: #0d253f;
+      color: white;
+      padding: 8px 0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 15px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .response-form button:hover {
+      background: #123d6a;
+    }
+    .response-success {
+      color: green;
+      font-weight: bold;
+      margin-top: 8px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Missing Persons</h2>
+    <div id="missingList" class="missing-list"></div>
+  </div>
+  <script src="missing_add.js"></script>
+</body>
+</html>

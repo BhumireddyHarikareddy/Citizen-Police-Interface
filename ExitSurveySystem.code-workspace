@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../xampp/htdocs/ExitSurveySystem"
+		},
+		{
+			"path": "../csp"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "csp"
+	}
+}
