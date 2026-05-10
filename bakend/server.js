@@ -1,9 +1,15 @@
 require("dotenv").config();
+const path = require("path");
+const fs = require("fs");
 
+const uploadPath = path.join(__dirname, "uploads");
+
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath);
+}
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
-const path = require("path");
 const mysql = require("mysql2");
 
 const app = express();
@@ -11,12 +17,12 @@ app.use(cors());
 app.use(express.json());
 
 // Serve uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static(uploadPath));
 
 // Multer setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../uploads'));
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
@@ -30,7 +36,7 @@ const db = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT
+  port: Number(process.env.DB_PORT)
 });
 
 db.connect(err => {
