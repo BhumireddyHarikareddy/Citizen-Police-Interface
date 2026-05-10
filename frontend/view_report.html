@@ -280,7 +280,7 @@ async function applyFilter() {
 
 async function toggleStatus(id) {
   try {
-    const res = await fetch(`http://localhost:3000/api/reports/${id}/toggle-status`, { method: 'PATCH' });
+    const res = await fetch(`https://citizen-police-interface.onrender.com/api/reports/${id}/toggle-status`, { method: 'PATCH' });
     const result = await res.json();
     if(result.success) {
       alert('Status updated successfully!');
