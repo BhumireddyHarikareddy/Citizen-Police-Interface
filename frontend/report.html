@@ -428,7 +428,9 @@
       const formData = new FormData(form);
       const data = {};
       formData.forEach((value, key) => {
+         if (value !== "" && value !== null) {
         data[key] = value;
+         }
       });
       // Add crimeType (in case not included)
       data.crimeType = document.getElementById('crimeType').value;
