@@ -14,11 +14,9 @@ app.use(express.json());
 
 // ================= UPLOAD FOLDER =================
 const uploadPath = path.join(__dirname, "uploads");
-
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath);
 }
-
 app.use('/uploads', express.static(uploadPath));
 
 // ================= MULTER =================
@@ -26,7 +24,6 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadPath),
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
 });
-
 const upload = multer({ storage });
 
 // ================= DATABASE =================
@@ -78,16 +75,13 @@ app.post('/api/report', (req, res) => {
     let value = req.body[key];
 
     if (value !== undefined && value !== "") {
-
       if (key.includes("datetime")) {
         value = formatDatetime(value);
       }
-
       data[key] = value;
     }
   });
 
-  // Required fields (as per SQL NOT NULL)
   if (!data.reporterName || !data.reporterAge || !data.reporterGender ||
       !data.reporterPhone || !data.reporterEmail || !data.reporterAddress ||
       !data.crimeType) {
@@ -101,19 +95,25 @@ app.post('/api/report', (req, res) => {
   db.query('INSERT INTO crime_reports SET ?', data, (err) => {
     if (err) {
       console.error("REPORT ERROR:", err);
-      return res.status(500).json({
-        success: false,
-        message: err.message
-      });
+      return res.status(500).json({ success: false });
     }
 
     res.json({ success: true });
   });
 });
 
+// ✅ FIXED: ORDER BY (latest first)
+app.get('/api/reports', (req, res) => {
+  db.query('SELECT * FROM crime_reports ORDER BY id DESC', (err, results) => {
+    if (err) return res.status(500).json({ success: false });
+
+    res.json({ success: true, data: results });
+  });
+});
+
 // ================= WANTED =================
 app.get('/api/wanted', (req, res) => {
-  db.query('SELECT * FROM wanted_criminals', (err, results) => {
+  db.query('SELECT * FROM wanted_criminals ORDER BY id DESC', (err, results) => {
     if (err) return res.status(500).json({ success: false });
     res.json({ success: true, data: results });
   });
@@ -125,33 +125,37 @@ app.post('/api/wanted', upload.single('photo'), (req, res) => {
   const photo = req.file ? '/uploads/' + req.file.filename : '';
 
   if (!name || !age || !gender || !crime || !lastSeen || !contact) {
-    return res.status(400).json({ success: false, message: "Missing fields" });
+    return res.status(400).json({ success: false });
   }
 
   db.query(
     'INSERT INTO wanted_criminals (photo,name,age,gender,crime,last_seen_location,contact) VALUES (?,?,?,?,?,?,?)',
     [photo, name, age, gender, crime, lastSeen, contact],
     (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ success: false });
-      }
+      if (err) return res.status(500).json({ success: false });
       res.json({ success: true });
     }
   );
 });
 
-// ================= WANTED RESPONSES =================
+// ✅ FIXED: ORDER BY
 app.get('/api/wanted-responses', (req, res) => {
-  db.query('SELECT * FROM wanted_responses', (err, results) => {
+  db.query('SELECT * FROM wanted_responses ORDER BY id DESC', (err, results) => {
     if (err) return res.status(500).json({ success: false });
     res.json({ success: true, data: results });
   });
 });
 
+// ✅ FIXED: datetime + validation
 app.post('/api/wanted-responses', (req, res) => {
 
-  const { wanted_id, location, time, person, contact, details, aadhaar, organization, designation } = req.body;
+  let { wanted_id, location, time, person, contact, details, aadhaar, organization, designation } = req.body;
+
+  time = formatDatetime(time);
+
+  if (!wanted_id || !location || !time || !person || !contact) {
+    return res.status(400).json({ success: false });
+  }
 
   db.query(
     `INSERT INTO wanted_responses 
@@ -167,7 +171,7 @@ app.post('/api/wanted-responses', (req, res) => {
 
 // ================= MISSING =================
 app.get('/api/missing', (req, res) => {
-  db.query('SELECT * FROM missing_persons', (err, results) => {
+  db.query('SELECT * FROM missing_persons ORDER BY id DESC', (err, results) => {
     if (err) return res.status(500).json({ success: false });
     res.json({ success: true, data: results });
   });
@@ -175,7 +179,7 @@ app.get('/api/missing', (req, res) => {
 
 app.post('/api/missing', upload.single('photo'), (req, res) => {
 
-  const {
+  let {
     name, age, gender,
     last_seen_location,
     last_seen_datetime,
@@ -186,36 +190,42 @@ app.post('/api/missing', upload.single('photo'), (req, res) => {
 
   const photo = req.file ? '/uploads/' + req.file.filename : '';
 
+  last_seen_datetime = formatDatetime(last_seen_datetime);
+
   if (!name || !age || !gender || !last_seen_location || !last_seen_datetime || !clothing || !contact) {
-    return res.status(400).json({ success: false, message: "Missing fields" });
+    return res.status(400).json({ success: false });
   }
 
   db.query(
     `INSERT INTO missing_persons 
     (photo,name,age,gender,last_seen_location,last_seen_datetime,clothing,identification_marks,contact,status)
     VALUES (?,?,?,?,?,?,?,?,?,'missing')`,
-    [photo, name, age, gender, last_seen_location, formatDatetime(last_seen_datetime), clothing, identification_marks, contact],
+    [photo, name, age, gender, last_seen_location, last_seen_datetime, clothing, identification_marks, contact],
     (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ success: false });
-      }
+      if (err) return res.status(500).json({ success: false });
       res.json({ success: true });
     }
   );
 });
 
-// ================= MISSING RESPONSES =================
+// ✅ FIXED: ORDER BY
 app.get('/api/missing-responses', (req, res) => {
-  db.query('SELECT * FROM missing_responses', (err, results) => {
+  db.query('SELECT * FROM missing_responses ORDER BY id DESC', (err, results) => {
     if (err) return res.status(500).json({ success: false });
     res.json({ success: true, data: results });
   });
 });
 
+// ✅ FIXED: datetime + validation
 app.post('/api/missing-responses', (req, res) => {
 
-  const { missing_id, location, time, person, contact, details, aadhaar, organization, designation } = req.body;
+  let { missing_id, location, time, person, contact, details, aadhaar, organization, designation } = req.body;
+
+  time = formatDatetime(time);
+
+  if (!missing_id || !location || !time || !person || !contact) {
+    return res.status(400).json({ success: false });
+  }
 
   db.query(
     `INSERT INTO missing_responses 
