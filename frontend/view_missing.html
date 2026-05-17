@@ -121,6 +121,43 @@
     <h2>Missing Persons</h2>
     <div id="missingList" class="missing-list"></div>
   </div>
-  <script src="missing_add.js"></script>
+  <script>
+    const API_BASE = 'https://citizen-police-interface.onrender.com';
+
+    function createMissingCard(item) {
+      const card = document.createElement('div');
+      card.className = 'missing-card';
+      card.innerHTML = `
+        <img src="${item.photo || ''}" alt="Missing Person Photo" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120?text=No+Image'">
+        <h3>${item.name || 'Unknown'}</h3>
+        <p><strong>Age:</strong> ${item.age || 'N/A'}</p>
+        <p><strong>Gender:</strong> ${item.gender || 'N/A'}</p>
+        <p><strong>Last Seen:</strong> ${item.last_seen_location || 'N/A'}</p>
+        <p><strong>Date/Time:</strong> ${item.last_seen_datetime || 'N/A'}</p>
+        <p><strong>Contact:</strong> ${item.contact || 'N/A'}</p>
+        <p class="status ${item.status === 'found' ? 'found' : 'missing'}">${item.status || 'missing'}</p>
+      `;
+      return card;
+    }
+
+    async function loadMissingPersons() {
+      const list = document.getElementById('missingList');
+      try {
+        const res = await fetch(`${API_BASE}/api/missing`);
+        const json = await res.json();
+        if (!json.success || !Array.isArray(json.data) || json.data.length === 0) {
+          list.innerHTML = '<p style="text-align:center; width:100%;">No missing persons found.</p>';
+          return;
+        }
+        list.innerHTML = '';
+        json.data.forEach(item => list.appendChild(createMissingCard(item)));
+      } catch (err) {
+        list.innerHTML = '<p style="text-align:center; width:100%; color:red;">Unable to load missing persons.</p>';
+        console.error(err);
+      }
+    }
+
+    loadMissingPersons();
+  </script>
 </body>
 </html>

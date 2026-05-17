@@ -33,11 +33,14 @@
   </table>
   <script>
     async function fetchResponses() {
-      const res = await fetch('https://citizen-police-interface.onrender.com/api/wanted');
+      const res = await fetch('https://citizen-police-interface.onrender.com/api/wanted-responses');
       const data = await res.json();
-      if (!data.success) return;
       const responseList = document.getElementById('responseList');
       responseList.innerHTML = '';
+      if (!data.success || !Array.isArray(data.data) || data.data.length === 0) {
+        responseList.innerHTML = '<tr><td colspan="10" style="text-align:center;">No wanted responses submitted yet.</td></tr>';
+        return;
+      }
       data.data.forEach(resp => {
         const row = document.createElement('tr');
         row.innerHTML = `

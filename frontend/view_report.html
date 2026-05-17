@@ -48,12 +48,13 @@
 </table>
 
 <script>
+const API_BASE = 'https://citizen-police-interface.onrender.com';
+
 async function fetchReports() {
   try {
-    const response = await fetch('http://localhost:3004/api/reports'); // view_report.js backend
+    const response = await fetch(`${API_BASE}/api/reports`);
     if (!response.ok) throw new Error('Network response was not ok: ' + response.status);
     const data = await response.json();
-    // Backend may return { success: true, data: [...] } or an array directly
     if (Array.isArray(data)) return data;
     if (data && data.success && Array.isArray(data.data)) return data.data;
     console.warn('Unexpected reports response shape:', data);

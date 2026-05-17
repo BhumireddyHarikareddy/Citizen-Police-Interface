@@ -105,6 +105,43 @@
     <h2>Wanted Criminals</h2>
     <div id="wantedList" class="wanted-list"></div>
   </div>
-  <script src="wanted_add.js"></script>
+  <script>
+    const API_BASE = 'https://citizen-police-interface.onrender.com';
+
+    function createWantedCard(item) {
+      const card = document.createElement('div');
+      card.className = 'wanted-card';
+      card.innerHTML = `
+        <img src="${item.photo || ''}" alt="Wanted Criminal Photo" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x120?text=No+Image'">
+        <h3>${item.name || 'Unknown'}</h3>
+        <p><strong>Age:</strong> ${item.age || 'N/A'}</p>
+        <p><strong>Gender:</strong> ${item.gender || 'N/A'}</p>
+        <p><strong>Crime:</strong> ${item.crime || 'N/A'}</p>
+        <p><strong>Last Seen:</strong> ${item.last_seen_location || 'N/A'}</p>
+        <p><strong>Contact:</strong> ${item.contact || 'N/A'}</p>
+        <p class="status ${item.status === 'Caught' ? 'found' : 'missing'}">${item.status || 'Wanted'}</p>
+      `;
+      return card;
+    }
+
+    async function loadWantedList() {
+      const list = document.getElementById('wantedList');
+      try {
+        const res = await fetch(`${API_BASE}/api/wanted`);
+        const json = await res.json();
+        if (!json.success || !Array.isArray(json.data) || json.data.length === 0) {
+          list.innerHTML = '<p style="text-align:center; width:100%;">No wanted criminals found.</p>';
+          return;
+        }
+        list.innerHTML = '';
+        json.data.forEach(item => list.appendChild(createWantedCard(item)));
+      } catch (err) {
+        list.innerHTML = '<p style="text-align:center; width:100%; color:red;">Unable to load wanted criminals.</p>';
+        console.error(err);
+      }
+    }
+
+    loadWantedList();
+  </script>
 </body>
 </html>
