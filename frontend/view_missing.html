@@ -114,6 +114,20 @@
       margin-top: 8px;
       text-align: center;
     }
+    .toggle-form-button {
+      background: #0d253f;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      margin: 8px 0;
+      width: 100%;
+      transition: background 0.3s;
+    }
+    .toggle-form-button:hover {
+      background: #123d6a;
+    }
   </style>
 </head>
 <body>
@@ -136,8 +150,77 @@
         <p><strong>Date/Time:</strong> ${item.last_seen_datetime || 'N/A'}</p>
         <p><strong>Contact:</strong> ${item.contact || 'N/A'}</p>
         <p class="status ${item.status === 'found' ? 'found' : 'missing'}">${item.status || 'missing'}</p>
+        <button class="toggle-form-button" type="button" onclick="toggleResponseForm(${item.id})">Report a sighting</button>
+        <form id="response-form-${item.id}" class="response-form" style="display:none;">
+          <label for="location-${item.id}">Location</label>
+          <input type="text" id="location-${item.id}" name="location" required>
+          <label for="time-${item.id}">Date/Time</label>
+          <input type="datetime-local" id="time-${item.id}" name="time" required>
+          <label for="person-${item.id}">Your Name</label>
+          <input type="text" id="person-${item.id}" name="person" required>
+          <label for="contact-${item.id}">Contact</label>
+          <input type="text" id="contact-${item.id}" name="contact" required>
+          <label for="aadhaar-${item.id}">Aadhaar</label>
+          <input type="text" id="aadhaar-${item.id}" name="aadhaar">
+          <label for="organization-${item.id}">Organization</label>
+          <input type="text" id="organization-${item.id}" name="organization">
+          <label for="designation-${item.id}">Designation</label>
+          <input type="text" id="designation-${item.id}" name="designation">
+          <label for="details-${item.id}">Details</label>
+          <textarea id="details-${item.id}" name="details" rows="3"></textarea>
+          <button type="button" onclick="submitMissingResponse(${item.id})">Submit Sighting</button>
+          <div id="response-message-${item.id}" class="response-success"></div>
+        </form>
       `;
       return card;
+    }
+
+    function toggleResponseForm(id) {
+      const form = document.getElementById(`response-form-${id}`);
+      if (!form) return;
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function submitMissingResponse(id) {
+      const form = document.getElementById(`response-form-${id}`);
+      const msg = document.getElementById(`response-message-${id}`);
+      if (!form || !msg) return;
+      msg.style.color = 'green';
+      msg.textContent = 'Submitting...';
+
+      const payload = {
+        missing_id: id,
+        location: document.getElementById(`location-${id}`).value,
+        time: document.getElementById(`time-${id}`).value,
+        person: document.getElementById(`person-${id}`).value,
+        contact: document.getElementById(`contact-${id}`).value,
+        details: document.getElementById(`details-${id}`).value,
+        aadhaar: document.getElementById(`aadhaar-${id}`).value,
+        organization: document.getElementById(`organization-${id}`).value,
+        designation: document.getElementById(`designation-${id}`).value
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/api/missing-responses`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          msg.style.color = 'green';
+          msg.textContent = 'Sighting submitted successfully.';
+          form.reset();
+          form.style.display = 'none';
+        } else {
+          msg.style.color = 'red';
+          msg.textContent = json.message || 'Submission failed.';
+        }
+      } catch (err) {
+        msg.style.color = 'red';
+        msg.textContent = 'Unable to submit sighting.';
+        console.error(err);
+      }
     }
 
     async function loadMissingPersons() {
