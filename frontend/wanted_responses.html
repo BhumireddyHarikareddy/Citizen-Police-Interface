@@ -33,7 +33,7 @@
   </table>
   <script>
     async function fetchResponses() {
-      const res = await fetch('https://citizen-police-interface.onrender.com/api/wanted-responses');
+      const res = await fetch('https://citizen-police-interface.onrender.com/api/wanted-responses'+item.photo);
       const data = await res.json();
       const responseList = document.getElementById('responseList');
       responseList.innerHTML = '';
