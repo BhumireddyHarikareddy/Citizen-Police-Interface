@@ -3,8 +3,8 @@ const path = require("path");
 const fs = require("fs");
 const express = require("express");
 const cors = require("cors");
-const multer = require("multer");
 const mysql = require("mysql2");
+const { upload } = require("./upload");
 
 const app = express();
 
@@ -18,13 +18,6 @@ if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath);
 }
 app.use('/uploads', express.static(uploadPath));
-
-// ================= MULTER =================
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadPath),
-  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
-});
-const upload = multer({ storage });
 
 // ================= DATABASE =================
 const db = mysql.createConnection({
@@ -46,6 +39,36 @@ const formatDatetime = (value) => {
   if (value.includes("T")) return value.replace("T", " ") + ":00";
   return value;
 };
+
+const getUploadedImageUrl = (file) => file?.secure_url || file?.path || "";
+
+// ================= CLOUDINARY UPLOAD =================
+// Upload endpoint (Cloudinary)
+app.post('/api/upload', upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: "No image uploaded" });
+  }
+
+  const imageUrl = getUploadedImageUrl(req.file);
+
+  // Example: save `imageUrl` to a DB table if you want to persist uploads
+  // db.query('INSERT INTO uploaded_images (image_url, created_at) VALUES (?, NOW())', [imageUrl], (err) => {
+  //   if (err) console.error('DB SAVE ERROR:', err);
+  // });
+
+  res.json({
+    success: true,
+    imageUrl,
+    message: "Image uploaded successfully"
+  });
+});
+
+// Alias without /api for simple clients
+app.post('/upload', upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ success: false, message: 'No image uploaded' });
+  const imageUrl = getUploadedImageUrl(req.file);
+  res.json({ success: true, imageUrl });
+});
 
 // ================= LOGIN =================
 app.post('/api/login', (req, res) => {
@@ -119,10 +142,10 @@ app.get('/api/wanted', (req, res) => {
   });
 });
 
-app.post('/api/wanted', upload.single('photo'), (req, res) => {
+app.post('/api/wanted', upload.single('image'), (req, res) => {
 
   const { name, age, gender, crime, lastSeen, contact } = req.body;
-  const photo = req.file ? '/uploads/' + req.file.filename : '';
+  const photo = getUploadedImageUrl(req.file);
 
   if (!name || !age || !gender || !crime || !lastSeen || !contact) {
     return res.status(400).json({ success: false });
@@ -177,7 +200,7 @@ app.get('/api/missing', (req, res) => {
   });
 });
 
-app.post('/api/missing', upload.single('photo'), (req, res) => {
+app.post('/api/missing', upload.single('image'), (req, res) => {
 
   let {
     name, age, gender,
@@ -188,7 +211,7 @@ app.post('/api/missing', upload.single('photo'), (req, res) => {
     contact
   } = req.body;
 
-  const photo = req.file ? '/uploads/' + req.file.filename : '';
+  const photo = getUploadedImageUrl(req.file);
 
   last_seen_datetime = formatDatetime(last_seen_datetime);
 
