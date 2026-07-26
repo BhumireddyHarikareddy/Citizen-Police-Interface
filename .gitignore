@@ -2,3 +2,5 @@ node_modules/
 uploads/
 .env
 *.log
+ExitSurveySystem.code-workspace
+s.html
