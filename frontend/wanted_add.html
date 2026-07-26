@@ -66,8 +66,8 @@
   <div class="container">
     <h2>Add Wanted Criminal</h2>
     <form id="wantedForm" enctype="multipart/form-data">
-      <label for="photo">Photo:</label>
-      <input type="file" id="photo" name="photo" accept="image/*" required>
+      <label for="image">Photo:</label>
+      <input type="file" id="image" name="image" accept="image/*" required>
       <img id="photoPreview" class="photo-preview" style="display:none;" />
 
       <label for="name">Full Name:</label>
@@ -99,7 +99,7 @@
   </div>
   <script>
     // Preview photo before upload
-    document.getElementById('photo').addEventListener('change', function(e) {
+    document.getElementById('image').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
